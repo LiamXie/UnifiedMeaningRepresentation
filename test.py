@@ -11,7 +11,7 @@ import datetime
 import json
 
 MODEL_NAMES=['laion/CLIP-ViT-B-16-laion2B-s34B-b88K']
-DATASETS = ['THUE_SUBWAY', 'THUE_TASK']
+DATASETS = ['TEST']
 SAMPLE_ON=False
 
 # define a feature computation function

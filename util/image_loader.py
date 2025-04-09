@@ -3,68 +3,6 @@ import random
 import numpy as np
 from PIL import Image
 
-def load_image(image_path,unit_n_H:int,unit_n_W:int,unit_size_H:int,unit_size_W:int,stride_H:int,stride_W:int,
-               target_size=None,patch_on=True,seq_on=False):
-    # get list of images file name in the folder
-    imgs = os.listdir(image_path)
-
-    # seq_on for video to load sequence of frames
-    if seq_on:
-        imgs = [imgname for imgname in imgs if imgname[-4:] == '.jpg']
-        for imgname in imgs:
-            if imgname[-4:] != '.jpg':
-                continue
-            # open image file
-            img = Image.open(image_path + imgname).convert("RGB")
-            # divide to patches
-            img_ith = int(imgname.split('.')[0])
-            img_seq=[Image.open(image_path + str(img_ith-i).zfill(4)+'.jpg').convert("RGB")
-                    for i in range(0,min(25,img_ith),5)]
-            
-            patches = []
-            if patch_on:
-                for h in range(unit_n_H):
-                    patches.append([])
-                    for w in range(unit_n_W):
-                        patch = img.crop((w*stride_W, h*stride_H, w*stride_W+unit_size_W, h*stride_H+unit_size_H))
-                        if target_size is not None:
-                            patch = patch.resize(target_size,resample=Image.BICUBIC)
-                        # patch.show()
-                        patches[h].append(patch)
-            # img = img.resize((,H),resample=Image.NEAREST)
-            if target_size is not None:
-                # img = img.resize(target_size,resample=Image.NEAREST)
-                for i in range(len(img_seq)):
-                    img_seq[i] = img_seq[i].resize(target_size,resample=Image.BICUBIC)
-            # img.show()
-            yield img_seq,patches,imgname
-    else:
-        for imgname in imgs:
-            if not (imgname[-4:] == '.jpg' or imgname[-4:] == '.png'):
-                continue
-            # open image file
-            img = Image.open(image_path + imgname).convert("RGB")
-
-            # get image size
-            ori_size = img.size
-            # divide to patches
-            
-            patches = []
-            if patch_on:
-                for h in range(unit_n_H):
-                    patches.append([])
-                    for w in range(unit_n_W):
-                        patch = img.crop((w*stride_W, h*stride_H, w*stride_W+unit_size_W, h*stride_H+unit_size_H))
-                        if target_size is not None:
-                            patch = patch.resize(target_size,resample=Image.BICUBIC)
-                        # patch.show()
-                        patches[h].append(patch)
-            # img = img.resize((,H),resample=Image.NEAREST)
-            if target_size is not None:
-                img = img.resize(target_size,resample=Image.BICUBIC)
-            # img.show()
-            yield img,patches,imgname,ori_size
-
 def load_image_pad(image_path,patch_div,stride_div,
                target_size=None,patch_on=True,seq_on=False,sample_on=False):
     # get list of images file name in the folder
@@ -131,48 +69,6 @@ def load_image_pad(image_path,patch_div,stride_div,
                         patch = img.crop((w*stride_W, h*stride_H, w*stride_W+unit_size_W, h*stride_H+unit_size_H))
                         if target_size is not None:
                             patch = patch.resize(target_size,resample=Image.BICUBIC)
-                        patches[h].append(patch)
-            # img = img.resize((,H),resample=Image.NEAREST)
-            if target_size is not None:
-                img = img.resize(target_size,resample=Image.BICUBIC)
-            # img.show()
-            yield img,patches,imgname,ori_size
-
-def load_image_div(image_path,patch_div,stride_div,
-               target_size=None,patch_on=True,seq_on=False):
-    # get list of images file name in the folder
-    imgs = os.listdir(image_path)
-    unit_n = patch_div*stride_div-stride_div+1
-    # seq_on for video to load sequence of frames
-    if seq_on:
-        raise NotImplementedError
-    else:
-        for imgname in imgs:
-            if not (imgname[-4:] == '.jpg' or imgname[-4:] == '.png'):
-                continue
-            # open image file
-            img = Image.open(image_path + imgname).convert("RGB")
-
-            # get image size
-            ori_size = img.size
-            scale_size=(target_size[0]*patch_div,target_size[1]*patch_div)
-            if target_size is not None:
-                img = img.resize(scale_size,resample=Image.BICUBIC)
-                unit_size_W = scale_size[0]//patch_div
-                unit_size_H = scale_size[1]//patch_div
-                stride_W = scale_size[0]//patch_div//stride_div
-                stride_H = scale_size[1]//patch_div//stride_div
-            # divide to patches
-            
-            patches = []
-            if patch_on:
-                for h in range(unit_n):
-                    patches.append([])
-                    for w in range(unit_n):
-                        patch = img.crop((w*stride_W, h*stride_H, w*stride_W+unit_size_W, h*stride_H+unit_size_H))
-                        if target_size is not None:
-                            patch = patch.resize(target_size,resample=Image.BICUBIC)
-                        # patch.show()
                         patches[h].append(patch)
             # img = img.resize((,H),resample=Image.NEAREST)
             if target_size is not None:

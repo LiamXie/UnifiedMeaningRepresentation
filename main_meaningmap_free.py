@@ -11,7 +11,8 @@ import datetime
 import json
 
 MODEL_NAMES=['laion/CLIP-ViT-B-16-laion2B-s34B-b88K']
-DATASETS = ['THUE_SUBWAY', 'THUE_TASK']
+DATASETS = ['THUE_FREE']
+# DATASETS = ['DHF1K','UCF','Hollywood2','LEDOV']
 SAMPLE_ON=False
 
 # define a feature computation function
@@ -84,12 +85,6 @@ if __name__ == '__main__':
             DIV_PATCH_LIST=datasets_info[DATASETS]['DIV_PATCH_LIST']
             DIV_STRIDE=datasets_info[DATASETS]['DIV_STRIDE']
             dataset_path=datasets_info[DATASETS]['DATASET_PATH']
-
-            # load task json
-            parent_folder = os.path.dirname(dataset_path)
-            parent_folder = os.path.dirname(parent_folder)
-            with open(parent_folder+'/task.json','r') as f:
-                task_info = json.load(f)
             
             target_size = (224,224)
             
@@ -104,37 +99,26 @@ if __name__ == '__main__':
 
             # create save folders
             for DIV_PATCH in DIV_PATCH_LIST:
-                save_path_task = './outputs/'+DATASETS+'/TASK/'+MODEL_NAME+'_'+str(DIV_PATCH)+'_'+str(DIV_STRIDE)
                 save_path_free = './outputs/'+DATASETS+'/FREE/'+MODEL_NAME+'_'+str(DIV_PATCH)+'_'+str(DIV_STRIDE)
                 if not os.path.exists(save_path_free):
                     os.makedirs(save_path_free)
-                if not os.path.exists(save_path_task):
-                    os.makedirs(save_path_task)
-            save_path_final_task = './outputs/'+DATASETS+'/TASK/'+MODEL_NAME
             save_path_final_free = './outputs/'+DATASETS+'/FREE/'+MODEL_NAME
             if not os.path.exists(save_path_final_free):
                 os.makedirs(save_path_final_free)
-            if not os.path.exists(save_path_final_task):
-                os.makedirs(save_path_final_task)
 
             # generate meaning maps
             for folder in os.listdir(dataset_path):
                 if '.' in folder:
                     continue
-                # compute task feature
-                tok = tokenizer([task_info[folder]]).to(device)
-                task_feature = net.encode_text(tok).detach()
                 # compute random mean feature
                 mean_feature = compute_mean_feature(net,preprocess,device,target_size,MODEL_NAME)
                 with torch.no_grad():
                     for DIV_PATCH in DIV_PATCH_LIST:
                         P_N_H=(DIV_PATCH+2)*DIV_STRIDE-DIV_STRIDE-1
 
-                        save_path_task = './outputs/'+DATASETS+'/TASK/'+MODEL_NAME+'_'+str(DIV_PATCH)+'_'+str(DIV_STRIDE)
                         save_path_free = './outputs/'+DATASETS+'/FREE/'+MODEL_NAME+'_'+str(DIV_PATCH)+'_'+str(DIV_STRIDE)
 
                         os.makedirs(os.path.join(save_path_free,folder),exist_ok=True)
-                        os.makedirs(os.path.join(save_path_task,folder),exist_ok=True)
 
                         for ith,(img,patches,imgname,ori_size) in enumerate(load_image_pad(os.path.join(dataset_path,folder+'/images/'),
                                                                                 patch_div=DIV_PATCH,
@@ -147,11 +131,9 @@ if __name__ == '__main__':
                             image_features = compute_feature(img,net,preprocess,device,MODEL_NAME)
 
                             # compute patches similarity
-                            patches_sims_task=[]
                             patches_sims_free=[]
                             for h in range(P_N_H):
                                 patches_sims_free.append([])
-                                patches_sims_task.append([])
                                 img_tensor =[]
                                 for patch in patches[h]:
                                     img_tensor.append(preprocess(patch).to(device))
@@ -161,46 +143,28 @@ if __name__ == '__main__':
                                 with torch.no_grad():
                                     patch_features_h = net.encode_image(img_tensor)
                                 for patch_features in patch_features_h:
-                                    sim_task = torch.nn.functional.cosine_similarity(patch_features,task_feature-mean_feature).cpu().numpy().flatten()
                                     sim_free = torch.nn.functional.cosine_similarity(patch_features,image_features-mean_feature).cpu().numpy().flatten()
 
                                     patches_sims_free[h].append(sim_free)
-                                    patches_sims_task[h].append(sim_task)
 
                             meaning_map_free = compute_meaning_map(patches_sims_free,logit_scale,ori_size)
-                            meaning_map_task = compute_meaning_map(patches_sims_task,logit_scale,ori_size)
 
                             # save as image
-                            img_save_task = meaning_map_task / np.max(meaning_map_task) * 255
-                            img_save_task = Image.fromarray(img_save_task)
-                            img_save_task = img_save_task.convert('L')
-                            img_save_task.save(os.path.join(save_path_task,folder,imgname))
-
                             img_save_free = meaning_map_free / np.max(meaning_map_free) * 255
                             img_save_free = Image.fromarray(img_save_free)
                             img_save_free = img_save_free.convert('L')
                             img_save_free.save(os.path.join(save_path_free,folder,imgname))
                     
                     # add different patch scale
-                    if not os.path.exists(os.path.join(save_path_final_task,folder)):
-                        os.makedirs(os.path.join(save_path_final_task,folder))
                     if not os.path.exists(os.path.join(save_path_final_free,folder)):
                         os.makedirs(os.path.join(save_path_final_free,folder))
                     for img in os.listdir(os.path.join(dataset_path,folder+'/images/')):
                         maps_free=[]
-                        maps_task=[]
                         for DIV_PATCH in DIV_PATCH_LIST:
-                            save_path_task = './outputs/'+DATASETS+'/TASK/'+MODEL_NAME+'_'+str(DIV_PATCH)+'_'+str(DIV_STRIDE)
                             save_path_free = './outputs/'+DATASETS+'/FREE/'+MODEL_NAME+'_'+str(DIV_PATCH)+'_'+str(DIV_STRIDE)
                             map_free=np.array(Image.open(os.path.join(save_path_free,folder,img)).convert('L')).astype(np.float32)/255
-                            map_task=np.array(Image.open(os.path.join(save_path_task,folder,img)).convert('L')).astype(np.float32)/255
                             maps_free.append(map_free)
-                            maps_task.append(map_task)
                         maps_free = np.array(maps_free).mean(0)
-                        maps_task = np.array(maps_task).mean(0)
                         maps_free = maps_free / maps_free.max()
-                        maps_task = maps_task / maps_task.max()
                         maps_free = Image.fromarray((maps_free*255).astype(np.uint8))
-                        maps_task = Image.fromarray((maps_task*255).astype(np.uint8))
                         maps_free.save(os.path.join(save_path_final_free,folder,img))
-                        maps_task.save(os.path.join(save_path_final_task,folder,img))

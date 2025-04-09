@@ -1,0 +1,11 @@
+{
+"DHF1K": {"DATASET_PATH": "./data/DHF1K/annotation/", "DIV_PATCH_LIST": [3, 6], "DIV_STRIDE": 4, "MEANING_PATH": "./outputs/DHF1K/FREE/MeaningMap/", "GBVS_PATH": "./outputs/DHF1K/GBVS/"}, 
+"UCF": {"DATASET_PATH": "./data/ucf/testing/", "DIV_PATCH_LIST": [3, 6], "DIV_STRIDE": 4, "MEANING_PATH": "./outputs/UCF/FREE/MeaningMap/", "GBVS_PATH": "./outputs/UCF/GBVS/"}, 
+"Hollywood2": {"DATASET_PATH": "./data/Hollywood2_actions/testing/", "DIV_PATCH_LIST": [3, 6], "DIV_STRIDE": 4, "MEANING_PATH": "./outputs/Hollywood2/FREE/MeaningMap/", "GBVS_PATH": "./outputs/Hollywood2/GBVS/"}, 
+"LEDOV": {"DATASET_PATH": "./data/LEDOV/annotation/", "DIV_PATCH_LIST": [3, 6], "DIV_STRIDE": 4, "MEANING_PATH": "./outputs/LEDOV/FREE/MeaningMap/", "GBVS_PATH": "./outputs/LEDOV/GBVS/"}, 
+"THUE_FREE": {"DATASET_PATH": "./data/THUE-free/annotation/", "DIV_PATCH_LIST": [9, 18], "DIV_STRIDE": 4, "MEANING_PATH": "./outputs/THUE-free/FREE/MeaningMap/", "GBVS_PATH": "./outputs/THUE-free/GBVS/"}, 
+"THUE_TASK": {"DATASET_PATH": "./data/THUE-task/annotation/", "DIV_PATCH_LIST": [9, 18], "DIV_STRIDE": 4, "MEANING_PATH": "./outputs/THUE-task/Task/MeaningMap/", "GBVS_PATH": "./outputs/THUE-task/GBVS/"}, 
+"DREYEVE": {"DATASET_PATH": "./data/DREYEVE/annotation/", "DIV_PATCH_LIST": [3, 6], "DIV_STRIDE": 4, "GBVS_PATH": "./outputs/DREYEVE/GBVS/"}, 
+"THUE_SUBWAY": {"DATASET_PATH": "./data/THUE-subway/annotation/", "DIV_PATCH_LIST": [3, 6], "DIV_STRIDE": 4, "GBVS_PATH": "./outputs/THUE-subway/GBVS/"},
+"TEST": {"DATASET_PATH": "./data/test/annotation/", "DIV_PATCH_LIST": [9, 18], "DIV_STRIDE": 4, "MEANING_PATH": "./outputs/test/Task/MeaningMap/", "GBVS_PATH": "./outputs/test/GBVS/"}
+}
