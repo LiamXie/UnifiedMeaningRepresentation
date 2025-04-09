@@ -9,11 +9,11 @@ Download the datasets, and move the folders to ./data. The newly collected datas
 The existing datasets:
 
 * DHF1K - https://github.com/wenguanwang/DHF1K
-2. Hollywood-2 - http://vision.imar.ro/eyetracking/description.php
-3. THUE-free - https://github.com/LiamXie/UrbanVisualAttention
-4. UCF-Sport - http://vision.imar.ro/eyetracking/description.php
-5. LEDOV - https://github.com/remega/LEDOV-eye-tracking-database
-6. DR(eye)VE - https://aimagelab.ing.unimore.it/imagelab/page.asp?IdPage=8
+* Hollywood-2 - http://vision.imar.ro/eyetracking/description.php
+* THUE-free - https://github.com/LiamXie/UrbanVisualAttention
+* UCF-Sport - http://vision.imar.ro/eyetracking/description.php
+* LEDOV - https://github.com/remega/LEDOV-eye-tracking-database
+* DR(eye)VE - https://aimagelab.ing.unimore.it/imagelab/page.asp?IdPage=8
 
 ### **Dependencies**
 * torch 2.5.1+cuda 12.1
